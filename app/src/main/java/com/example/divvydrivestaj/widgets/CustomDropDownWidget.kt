@@ -1,5 +1,6 @@
 package com.example.divvydrivestaj.widgets
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -13,10 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.divvydrivestaj.constant.Tur
 import com.example.divvydrivestaj.viewmodel.AnasayfaVM
 import com.example.divvydrivestaj.viewmodel.DosyaIslemleriVM
@@ -30,29 +30,33 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CustomDropDown(
-    tur: Tur, klasorYolu:String, ad:String,
-
-     klasorIslemleriVM: KlasorIslemleriVM =KlasorIslemleriVM(),
-    dosyaIslemleriVM: DosyaIslemleriVM =DosyaIslemleriVM(),
-    anasayfaVM: AnasayfaVM =AnasayfaVM(),
-    dialogVM: MenuVM =MenuVM(),
+    tur: Tur,
+    klasorYolu:String,
+    ad:String,
+    klasorIslemleriVM: KlasorIslemleriVM,
+    dosyaIslemleriVM: DosyaIslemleriVM,
+    anasayfaVM: AnasayfaVM,
+    menuVM: MenuVM,
+    ticketVM:TicketVM,
+    context:Context
     ) {
-    val context = LocalContext.current
 
-    val ticketVM=TicketVM(context)
+
+
     val listItems = arrayOf("Sil", "Güncelle", "Taşı")
     val mevcutKlasor by klasorIslemleriVM.mevcutKlasorYolu.collectAsState()
     val ticketID by ticketVM.ticketID.collectAsState()
-    val acildimi = remember {
-        mutableStateOf(false)
-    }
+    val dropDownGoster by menuVM.dropdownGoster.collectAsStateWithLifecycle()
+
 
 
     Box(
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = {
-            acildimi.value=true
+            menuVM.tiklananAdAl(ad)
+            menuVM.dropDownGoster(true)
+            Log.e("Dropdown","açıldı")
         }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
@@ -60,8 +64,8 @@ fun CustomDropDown(
             )
         }
         DropdownMenu(
-        expanded = acildimi.value,
-            onDismissRequest = {acildimi.value=false
+        expanded = dropDownGoster,
+            onDismissRequest = { menuVM.dropDownGoster(false)
             Log.e("TicketID",ticketID)
             }
         ) {
@@ -96,13 +100,13 @@ fun CustomDropDown(
                                 }
                             }
                             1->{
-                                    dialogVM.guncelleDialogGoster()
+                                    menuVM.guncelleDialogGoster()
                             }
                             2->{
-
+                                    menuVM.tasiDialogGoster()
                             }
                         }
-                        acildimi.value=false
+                        menuVM.dropDownGoster(false)
                     },
                     text = {Text(text = itemValue)}
                 )

@@ -1,6 +1,7 @@
 package com.example.divvydrivestaj
 
 import SharedPref
+import android.content.Context
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -50,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.divvydrivestaj.constant.SharedText
 import com.example.divvydrivestaj.constant.Tur
 import com.example.divvydrivestaj.viewmodel.AnasayfaVM
@@ -59,6 +61,7 @@ import com.example.divvydrivestaj.viewmodel.MenuVM
 import com.example.divvydrivestaj.viewmodel.TicketVM
 import com.example.divvydrivestaj.widgets.CustomDropDown
 import com.example.divvydrivestaj.widgets.KlasorVeDosyaIslemleriDialogWidget
+import com.example.divvydrivestaj.widgets.TasiDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -68,15 +71,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Anasayfa(
-     klasorIslemleriVM: KlasorIslemleriVM =KlasorIslemleriVM(),
-     dosyaIslemleriVM: DosyaIslemleriVM =DosyaIslemleriVM(),
-     anasayfaVM: AnasayfaVM =AnasayfaVM(),
-     dialogVM: MenuVM =MenuVM()
+    context: Context = LocalContext.current,
+    klasorIslemleriVM: KlasorIslemleriVM,
+    dosyaIslemleriVM: DosyaIslemleriVM,
+    anasayfaVM: AnasayfaVM,
+    menuVM: MenuVM,
+    ticketVM: TicketVM,
+
+    sharedPref: SharedPref = SharedPref(context)
 
 ){
-    val context= LocalContext.current
-    val ticketVM=TicketVM(context)
-    val sharedPref=SharedPref(context)
+
 
     val klasorDonenSonuc by klasorIslemleriVM.klasorListesiDonenSonuc.collectAsState()
     val dosyaDonenSonuc by dosyaIslemleriVM.dosyaListesiDonenSonuc.collectAsState()
@@ -87,9 +92,13 @@ fun Anasayfa(
     val mevcutKlasorDolumu by klasorIslemleriVM.mevcutKlasorDolumu.collectAsState()
     val ticketID by ticketVM.ticketID.collectAsState()
     val mevcutKlasorAd by klasorIslemleriVM.mevcutKlasorAd.collectAsState()
-    val klasorOlusturDialogGoster by dialogVM.klasorOlusturDialogGoster.collectAsState()
-    val guncelleDialogGoster by dialogVM.guncelleDialogGoster.collectAsState()
-    val tfDeger by dialogVM.klasorOlusturDialogTF.collectAsState()
+    val klasorOlusturDialogGoster by menuVM.klasorOlusturDialogGoster.collectAsStateWithLifecycle()
+    val guncelleDialogGoster by menuVM.guncelleDialogGoster.collectAsStateWithLifecycle()
+    val tasiDialogGoster by menuVM.tasiDialogGoster.collectAsStateWithLifecycle()
+    val dialogTFDeger by menuVM.dialogTf.collectAsState()
+    val dropDownTiklananAd by menuVM.tiklananAdi.collectAsState()
+
+
 
 
     
@@ -204,8 +213,14 @@ fun Anasayfa(
                                         }
                                         CustomDropDown(
                                             tur = Tur.Klasor,
-                                            klasorYolu = "",
+                                            klasorYolu = mevcutKlasorYolu,
                                             ad = klasor.ad,
+                                            anasayfaVM = anasayfaVM,
+                                            dosyaIslemleriVM = dosyaIslemleriVM,
+                                            klasorIslemleriVM = klasorIslemleriVM,
+                                            menuVM = menuVM,
+                                            ticketVM = ticketVM,
+                                            context = context
                                         )
                                     }
                                 }
@@ -271,8 +286,14 @@ fun Anasayfa(
                                         }
                                         CustomDropDown(
                                             tur = Tur.Dosya,
-                                            klasorYolu = "",
+                                            klasorYolu = mevcutKlasorYolu,
                                             ad = dosya.ad,
+                                            anasayfaVM = anasayfaVM,
+                                            dosyaIslemleriVM = dosyaIslemleriVM,
+                                            klasorIslemleriVM = klasorIslemleriVM,
+                                            menuVM = menuVM,
+                                            ticketVM = ticketVM,
+                                            context = context
                                         )
                                     }
                                 }
@@ -302,6 +323,7 @@ fun Anasayfa(
               if(sharedPref.boolAl(SharedText.BeniHatirla,false)) {
                   ticketVM.ticketIDHatirla()
               }
+
               //TODO benihatıla işaretlenmeden giriş sağlanmıyor
               Log.e("Ticket", ticketID)
               klasorVeDosyaListesiGetir()
@@ -395,25 +417,35 @@ fun Anasayfa(
                 KlasorVeDosyaIslemleriDialogWidget(
                     title = "Klasor Guncelle",
                     tfIcerik = "",
+                    menuVM=menuVM,
                     onDismiss = {
-
+                        menuVM.guncelleDialogKapat()
                     }, onConfirm = {
-
+                        Log.e("Onconfirm :",ticketID)
+                        Log.e("Onconfirm :",mevcutKlasorYolu)
+                        Log.e("Onconfirm :",dialogTFDeger)
+                        //klasor adi doldurulacak
+                        menuVM.klasorGuncelleDialogOnConfirm(context = context, ticketID = ticketID, mevcutKlasor = mevcutKlasorYolu, klasorAdi = dropDownTiklananAd, yeniKlasorAdi = dialogTFDeger)
+                        menuVM.guncelleDialogGoster()
                     })
             }
             if(klasorOlusturDialogGoster) {
                 KlasorVeDosyaIslemleriDialogWidget(
                     title = "Klasor Oluştur",
                     tfIcerik = "",
+                    menuVM = menuVM,
                     onDismiss = {
-                        dialogVM.klasorOlusturDialogKapat()
+                        menuVM.klasorOlusturDialogKapat()
                     },
                     onConfirm = {
-                        Log.e("tfdeger",tfDeger)
-                        dialogVM.klasorOlusturDialogOnConfirm(context ,mevcutKlasorYolu, tfDeger = tfDeger)
-                        dialogVM.klasorOlusturDialogKapat()
+                        Log.e("tfdeger",dialogTFDeger)
+                        menuVM.klasorOlusturDialogOnConfirm(context ,mevcutKlasorYolu)
+
                     },
                 )
+            }
+            if(tasiDialogGoster){
+               TasiDialog(menuVM = menuVM)
             }
         },
         floatingActionButton = {
@@ -422,7 +454,7 @@ fun Anasayfa(
 
                FabAnimasyon(acildimi = fabAcikmi, buton = {
                    FloatingActionButton(onClick     = {
-                       dialogVM.klasorOlusturDialogGoster()
+                       menuVM.klasorOlusturDialogGoster()
                    }, Modifier.padding(bottom = 5.dp)) {
                        Icon(painter = painterResource(id = R.drawable.klasor_olustur_icon), contentDescription = "")
                    }

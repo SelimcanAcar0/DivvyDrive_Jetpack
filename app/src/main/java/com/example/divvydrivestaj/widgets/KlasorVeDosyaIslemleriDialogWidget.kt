@@ -19,10 +19,10 @@ fun KlasorVeDosyaIslemleriDialogWidget(
     tfIcerik:String,
     onDismiss:()->Unit,
     onConfirm:()->Unit,
-    dialogVM: MenuVM =MenuVM()
+    menuVM: MenuVM,
 ) {
 
-    val tf=dialogVM.klasorOlusturDialogTF.collectAsState()
+    val tf=menuVM.dialogTf.collectAsState()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -34,7 +34,7 @@ fun KlasorVeDosyaIslemleriDialogWidget(
                         value =tf.value,
                         label = { Text(text = tfIcerik)},
                         onValueChange = {
-                           dialogVM.klasorOlusturDialogTFGuncelle(it)
+                           menuVM.klasorOlusturDialogTFGuncelle(it)
                         },
                         keyboardActions = KeyboardActions(
                             onDone = {

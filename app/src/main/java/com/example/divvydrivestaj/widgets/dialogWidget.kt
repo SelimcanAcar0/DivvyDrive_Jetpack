@@ -122,7 +122,7 @@ fun CustomDialogWidget(tfDeger:String, dialogGoster: (Boolean) -> Unit) {
                                         klasorIslemleriVM.klasorOlustur(
                                             "2b6c9bb0-1483-4a55-bf92-9274f2394ab7",
                                             tf.value,
-                                            klasorIslemleriVM.mevcutKlasorYolu.value!!,
+                                            klasorIslemleriVM.mevcutKlasorYolu.value,
                                         )
                                         anasayfaVM.refreshDurumDegistir(true)
                                         delay(2000)

@@ -68,9 +68,11 @@ import kotlinx.coroutines.launch
 fun GirisEkran(navController: NavController,
                context: Context = LocalContext.current,
                sharedPref: SharedPref =SharedPref(context),
-               ticketVM: TicketVM =TicketVM(context),
-               anasayfaVM: AnasayfaVM = AnasayfaVM(),
-               girisVM: GirisVM =GirisVM(context)){
+               ticketVM: TicketVM,
+               anasayfaVM: AnasayfaVM,
+               girisVM: GirisVM,
+)
+{
 
     val ddMavisi = colorResource(id = R.color.dd_mavi)
     val kullaniciAdi = girisVM.kullaniciAdiTF.collectAsState()
@@ -78,6 +80,7 @@ fun GirisEkran(navController: NavController,
     val sifreGizlensinmi = girisVM.sifreGizlensinmi.collectAsState()
     val beniHatirla = girisVM.beniHatirla.collectAsState()
     val isRefreshing = anasayfaVM.refreshing.collectAsState()
+
 
         Column(
             modifier = Modifier
@@ -180,7 +183,7 @@ fun GirisEkran(navController: NavController,
                                    anasayfaVM.refreshDurumDegistir(true)
                                    val kullanici = Kullanici(kullaniciAdi.value, sifre.value)
                                    ticketVM.ticketAl(kullanici)
-                                    delay(2000)
+                                   delay(2000)
                                    if (ticketVM.ticket.value?.sonuc == false) {
                                        Handler(Looper.getMainLooper()).post {
                                            Toast.makeText(context, "Giriş Başarısız", Toast.LENGTH_SHORT).show()

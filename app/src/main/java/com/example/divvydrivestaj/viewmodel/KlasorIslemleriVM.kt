@@ -24,6 +24,7 @@ class KlasorIslemleriVM:ViewModel() {
     private val _mevcutKlasorBosmu= MutableStateFlow(false)
     private val _mevcutKlasorAd= MutableStateFlow<String?>(null)
 
+
     val klasorListesiDonenSonuc:StateFlow<KlasorListesiDonenSonuc?> get() = _klasorListesiDonenSonuc.asStateFlow()
     val klasorVeDosyaIslemleriDonenSonuc:StateFlow<KlasorVeDosyaIslemleriDonenSonuc?> get() = _klasorVeDosyaIslemleriDonenSonuc.asStateFlow()
     val mevcutKlasorYolu:StateFlow<String> get() =_mevcutKlasorYolu.asStateFlow()
@@ -149,7 +150,7 @@ class KlasorIslemleriVM:ViewModel() {
     fun klasorGuncelle(ticketID: String, klasorYolu: String,klasorAdi: String,yeniKlasorAdi: String){
         try {
             viewModelScope.launch {
-                val call = repository.klasorGuncelle(ticketID,klasorYolu,klasorAdi,yeniKlasorAdi)
+                val call = repository.klasorGuncelle(ticketID=ticketID,klasorYolu=klasorYolu,klasorAdi=klasorAdi, yeniKlasorAdi = yeniKlasorAdi)
                 call.enqueue(object : Callback<KlasorVeDosyaIslemleriDonenSonuc> {
                     override fun onFailure(call: Call<KlasorVeDosyaIslemleriDonenSonuc>, t: Throwable) {
                         Log.e("retrofit", "call failed")
