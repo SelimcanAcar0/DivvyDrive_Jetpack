@@ -445,7 +445,7 @@ fun Anasayfa(
                 )
             }
             if(tasiDialogGoster){
-               TasiDialog(menuVM = menuVM)
+               TasiDialog(menuVM,klasorIslemleriVM, dosyaIslemleriVM)
             }
         },
         floatingActionButton = {
