@@ -35,7 +35,7 @@ interface IServis {
     fun KlasorGuncelle(@Query("ticketID")ticketID: String,@Query("klasorYolu")klasorYolu: String,@Query("klasorAdi")klasorAdi:String,@Query("yeniKlasorAdi")yeniKlasorAdi:String): Call<KlasorVeDosyaIslemleriDonenSonuc>
 
     @PUT("KlasorTasi")
-    fun KlasorTasi(@Query("ticketID") ticketID: String, @Query("klasorYolu") klasorYolu: String,@Query("KlasorAdi") dosyaAdi: String,@Query("yeniDosyaYolu") yeniDosyaYolu: String): Call<KlasorVeDosyaIslemleriDonenSonuc>
+    fun KlasorTasi(@Query("ticketID") ticketID: String, @Query("klasorYolu") klasorYolu: String,@Query("KlasorAdi") dosyaAdi: String,@Query("yeniKlasorYolu") yeniDosyaYolu: String): Call<KlasorVeDosyaIslemleriDonenSonuc>
 
     @GET("DosyaListesiGetir")
     fun DosyaListesiGetir(@Query("ticketID") ticketID: String, @Query("klasorYolu") klasorYolu: String): Call<DosyaListesiDonenSonuc>

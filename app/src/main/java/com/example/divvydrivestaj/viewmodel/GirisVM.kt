@@ -30,7 +30,7 @@ class GirisVM(context: Context):ViewModel() {
         _sifreTF.value=text
     }
     fun sifreGosterDurumDegistir(){
-        _sifreGizlensinmi.value= !_sifreGizlensinmi.value!!
+        _sifreGizlensinmi.value= !_sifreGizlensinmi.value
     }
 
     fun beniHatirlaDurumDegistir(it:Boolean){

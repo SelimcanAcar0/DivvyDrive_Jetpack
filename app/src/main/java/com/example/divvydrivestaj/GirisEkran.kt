@@ -50,6 +50,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.divvydrivestaj.constant.Sayfalar
 import com.example.divvydrivestaj.constant.SharedText
 import com.example.divvydrivestaj.entity.Kullanici
@@ -65,7 +66,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GirisEkran(navController: NavController,
+fun GirisEkran(navController: NavHostController,
                context: Context = LocalContext.current,
                sharedPref: SharedPref =SharedPref(context),
                ticketVM: TicketVM,
@@ -73,14 +74,12 @@ fun GirisEkran(navController: NavController,
                girisVM: GirisVM,
 )
 {
-
     val ddMavisi = colorResource(id = R.color.dd_mavi)
     val kullaniciAdi = girisVM.kullaniciAdiTF.collectAsState()
     val sifre = girisVM.sifreTF.collectAsState()
     val sifreGizlensinmi = girisVM.sifreGizlensinmi.collectAsState()
     val beniHatirla = girisVM.beniHatirla.collectAsState()
     val isRefreshing = anasayfaVM.refreshing.collectAsState()
-
 
         Column(
             modifier = Modifier
@@ -184,25 +183,31 @@ fun GirisEkran(navController: NavController,
                                    val kullanici = Kullanici(kullaniciAdi.value, sifre.value)
                                    ticketVM.ticketAl(kullanici)
                                    delay(2000)
-                                   if (ticketVM.ticket.value?.sonuc == false) {
-                                       Handler(Looper.getMainLooper()).post {
-                                           Toast.makeText(context, "Giriş Başarısız", Toast.LENGTH_SHORT).show()
-                                       }
-                                   }
-
-                                   else {
-                                       if(beniHatirla.value){
-                                           sharedPref.boolKaydet(SharedText.BeniHatirla,true)
-                                           sharedPref.stringKaydet(SharedText.Ticket,ticketVM.ticket.value!!.ID)
-                                       }
-                                       Log.e("Ticket", "${ticketVM.ticket.value?.sonuc}")
-                                       navController.navigate(Sayfalar.ANASAYFA.page) {
-                                           popUpTo(Sayfalar.GIRIS_EKRAN.page) {
-                                               inclusive = true
+                                   when (ticketVM.ticket.value?.sonuc) {
+                                       false -> {
+                                           Handler(Looper.getMainLooper()).post {
+                                               Toast.makeText(context, "Giriş Başarısız", Toast.LENGTH_SHORT).show()
                                            }
                                        }
-
+                                       true -> {
+                                           if(beniHatirla.value){
+                                               sharedPref.boolKaydet(SharedText.BeniHatirla,true)
+                                               sharedPref.stringKaydet(SharedText.Ticket,ticketVM.ticket.value!!.ID)
+                                           }
+                                           Log.e("Ticket", "${ticketVM.ticket.value?.sonuc}")
+                                           navController.navigate(Sayfalar.ANASAYFA.page) {
+                                               popUpTo(Sayfalar.GIRIS_EKRAN.page) {
+                                                   inclusive = true
+                                               }
+                                           }
+                                       }
+                                       else -> {
+                                           Handler(Looper.getMainLooper()).post {
+                                               Toast.makeText(context, "Sunucuya Bağlanılamadı", Toast.LENGTH_SHORT).show()
+                                           }
+                                       }
                                    }
+
                                    anasayfaVM.refreshDurumDegistir(false)
 
 

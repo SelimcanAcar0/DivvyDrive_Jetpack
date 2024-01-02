@@ -53,6 +53,7 @@ class KlasorIslemleriVM:ViewModel() {
     }
     fun mevcutKlasorEkle(klasorAdi:String){
         _mevcutKlasorListesiArray.add(klasorAdi)
+        Log.e("MevcutKlasorEkle",_mevcutKlasorListesiArray.toString())
         mevcutKlasorYoluAl()
         mevcutKlasorDolumuKontrol()
     }

@@ -3,7 +3,12 @@ package com.example.divvydrivestaj.viewmodel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewModelScope
+import com.example.divvydrivestaj.constant.Tur
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,24 +23,23 @@ class MenuVM:ViewModel() {
 
       private val _guncelleDialogGoster = MutableStateFlow(false)
       private val _klasorOlusturDialogGoster = MutableStateFlow(false)
-      private val _dropdownGoster = MutableStateFlow(false)
       private val _tasiDialogGoster=MutableStateFlow(false)
       private val _dialogTf=MutableStateFlow("")
       private val _tiklananDropDownAd = MutableStateFlow("")
+      private val _secileninTuru=MutableStateFlow(Tur.Dosya)
 
 
        val guncelleDialogGoster:StateFlow<Boolean> get() = _guncelleDialogGoster
        val klasorOlusturDialogGoster:StateFlow<Boolean> get() = _klasorOlusturDialogGoster
-       val dropdownGoster:StateFlow<Boolean>  = _dropdownGoster
        val dialogTf:StateFlow<String> get() = _dialogTf
-    val tiklananAdi:StateFlow<String> get() =_tiklananDropDownAd
-
-    val tasiDialogGoster:StateFlow<Boolean> get() = _tasiDialogGoster
-
+       val tiklananAdi:StateFlow<String> get() =_tiklananDropDownAd
+       val tasiDialogGoster:StateFlow<Boolean> get() = _tasiDialogGoster
+        val secileninTuru:StateFlow<Tur> get() = _secileninTuru
+       val listItems = arrayOf("Sil", "Güncelle", "Taşı")
 
 
       fun klasorOlusturDialogOnConfirm(context: Context,mevcutKlasor:String) {
-          CoroutineScope(Dispatchers.Main).launch {
+          viewModelScope.launch {
               klasorIslemleriVM.klasorOlustur(
                   "2b6c9bb0-1483-4a55-bf92-9274f2394ab7",
                   klasorAdi = dialogTf.value,
@@ -79,9 +83,7 @@ class MenuVM:ViewModel() {
             ).show()
         }
     }
-    fun dosyaGuncelleDialogOnConfirm(){
 
-    }
     fun klasorOlusturDialogGoster() {
         _klasorOlusturDialogGoster.value= true
     }
@@ -98,9 +100,6 @@ class MenuVM:ViewModel() {
         _guncelleDialogGoster.value=false
     }
 
-    fun dropDownGoster(value:Boolean) {
-        _dropdownGoster.value= value
-    }
 
     fun tasiDialogGoster(){
         _tasiDialogGoster.value=true
@@ -116,6 +115,10 @@ class MenuVM:ViewModel() {
 
     fun tiklananAdAl(klasorAd:String){
         _tiklananDropDownAd.value=klasorAd
+    }
+
+    fun secilenTurAl(tur:Tur){
+        _secileninTuru.value=tur;
     }
 
 

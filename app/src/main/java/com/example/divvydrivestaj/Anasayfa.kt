@@ -4,6 +4,7 @@ import SharedPref
 import android.content.Context
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -77,7 +78,6 @@ fun Anasayfa(
     anasayfaVM: AnasayfaVM,
     menuVM: MenuVM,
     ticketVM: TicketVM,
-
     sharedPref: SharedPref = SharedPref(context)
 
 ){
@@ -97,6 +97,7 @@ fun Anasayfa(
     val tasiDialogGoster by menuVM.tasiDialogGoster.collectAsStateWithLifecycle()
     val dialogTFDeger by menuVM.dialogTf.collectAsState()
     val dropDownTiklananAd by menuVM.tiklananAdi.collectAsState()
+    val secilenTur by menuVM.secileninTuru.collectAsState()
 
 
 
@@ -213,7 +214,6 @@ fun Anasayfa(
                                         }
                                         CustomDropDown(
                                             tur = Tur.Klasor,
-                                            klasorYolu = mevcutKlasorYolu,
                                             ad = klasor.ad,
                                             anasayfaVM = anasayfaVM,
                                             dosyaIslemleriVM = dosyaIslemleriVM,
@@ -286,7 +286,6 @@ fun Anasayfa(
                                         }
                                         CustomDropDown(
                                             tur = Tur.Dosya,
-                                            klasorYolu = mevcutKlasorYolu,
                                             ad = dosya.ad,
                                             anasayfaVM = anasayfaVM,
                                             dosyaIslemleriVM = dosyaIslemleriVM,
@@ -421,10 +420,6 @@ fun Anasayfa(
                     onDismiss = {
                         menuVM.guncelleDialogKapat()
                     }, onConfirm = {
-                        Log.e("Onconfirm :",ticketID)
-                        Log.e("Onconfirm :",mevcutKlasorYolu)
-                        Log.e("Onconfirm :",dialogTFDeger)
-                        //klasor adi doldurulacak
                         menuVM.klasorGuncelleDialogOnConfirm(context = context, ticketID = ticketID, mevcutKlasor = mevcutKlasorYolu, klasorAdi = dropDownTiklananAd, yeniKlasorAdi = dialogTFDeger)
                         menuVM.guncelleDialogGoster()
                     })
@@ -444,14 +439,14 @@ fun Anasayfa(
                     },
                 )
             }
+            //TODO: NUll dönüyor çünkü klasor yolu ve yeni klasor yolu boş dönüyor
             if(tasiDialogGoster){
-               TasiDialog(menuVM,klasorIslemleriVM, dosyaIslemleriVM)
+               TasiDialog(
+                   menuVM=menuVM,klasorIslemleriVM=klasorIslemleriVM,dosyaIslemleriVM=dosyaIslemleriVM, tur = secilenTur, ad = dropDownTiklananAd, ticketVM = ticketVM)
             }
         },
         floatingActionButton = {
            Column {
-
-
                FabAnimasyon(acildimi = fabAcikmi, buton = {
                    FloatingActionButton(onClick     = {
                        menuVM.klasorOlusturDialogGoster()
@@ -461,11 +456,7 @@ fun Anasayfa(
                })
                FabAnimasyon(acildimi = fabAcikmi, buton = {
                    FloatingActionButton(onClick = {
-//                       val intent = Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//                           .apply {
-//                               addCategory(Intent.CATEGORY_OPENABLE)
-//                           }
-//                       launcher.launch(intent)
+
                    },Modifier.padding(bottom = 5.dp)) {
                        Icon(painter = painterResource(id = R.drawable.dosya_yukle_icon), contentDescription = "")
                    }
@@ -476,7 +467,6 @@ fun Anasayfa(
                    if(fabAcikmi)Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription ="")else Icon(imageVector = Icons.Default.Add, contentDescription ="")
                }
            }
-
                                },
     )
 
